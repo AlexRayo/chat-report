@@ -1,70 +1,66 @@
-// components/AudioList.tsx
+import { Dimensions, FlatList, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
-import { getStoredAudios } from '@/services/AudioStorageService';
-import { Audio } from 'expo-av';
+import { IconButton, Text } from 'react-native-paper';
 
-const AudioList = ({ reportId }) => {
-  const [audios, setAudios] = useState([]);
+import { AudioType, DialogDeleteProps } from '@/types/global';
+import { useAudioStore } from '@/store/useAudioStore';
+import useAudioController from '@/hooks/useAudioController';
+import useAudioStorageService from '@/services/useAudioStorageService';
+import { styles } from '@/styles/components';
+import DialogDelete from './DialogDelete';
+
+function AudioList() {
+  const { audios } = useAudioStore();
+  const [dialog, setDialog] = useState<DialogDeleteProps>({
+    show: false,
+    audio: null,
+    onDismiss: () => { }
+  });
+  const { playAudio, toggleAudio, isPaused, audioUri } = useAudioController();
+  const { getStoredAudios } = useAudioStorageService();
 
   useEffect(() => {
-    // Obtén todos los audios y filtra los que correspondan al reporte
-    const loadAudios = async () => {
-      const storedAudios = await getStoredAudios();
-      const filtered = storedAudios.filter(audio => audio.reportId === reportId);
-      setAudios(filtered);
-    };
-    loadAudios();
-  }, [reportId]);
-
-  // Función para reproducir un audio
-  const playAudio = async (uri) => {
-    try {
-      const { sound } = await Audio.Sound.createAsync({ uri });
-      await sound.playAsync();
-      // Opcional: libera el recurso cuando termine la reproducción
-      sound.setOnPlaybackStatusUpdate(status => {
-        if (status.didJustFinish) {
-          sound.unloadAsync();
-        }
-      });
-    } catch (error) {
-      console.error('Error reproduciendo el audio:', error);
-    }
-  };
+    getStoredAudios();
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Audios del Reporte {reportId}</Text>
+    <>
+      <DialogDelete show={dialog.show}
+        audio={dialog.audio}
+        onDismiss={dialog?.onDismiss} />
+      <Text variant='titleLarge' style={styles.h1}>
+        {audios.length === 0 ? 'No hay audios' : 'Audios'}
+      </Text>
       <FlatList
         data={audios}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: AudioType) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.audioItem}>
-            <Text>Audio grabado el: {new Date(item.date).toLocaleString()}</Text>
-            <Button title="Reproducir" onPress={() => playAudio(item.uri)} />
+          <View style={[styles.audioItem, item.processed ? { backgroundColor: '#dcfce7' } : { backgroundColor: '#f1f1f1' }]}>
+            <IconButton
+              icon="delete"
+              iconColor='tomato'
+              onPress={() => setDialog((prev) => ({ ...prev, show: true, audio: item }))}
+            />
+            <View>
+              <Text variant="bodyLarge" style={[{ fontWeight: 'bold', width: (Dimensions.get('window').width - 180) }]}>
+                {item.processed ? item.data.titulo : 'Audio'}
+              </Text>
+              <Text variant="bodyLarge">
+                {new Date(item.date).toLocaleString()}
+              </Text>
+            </View>
+
+
+            <IconButton
+              mode='outlined'
+              icon={!isPaused && audioUri === item.uri ? "pause" : "play"}
+              onPress={() => !isPaused && audioUri !== item.uri ? playAudio(item.uri) : toggleAudio()} />
           </View>
         )}
       />
-    </View>
-  );
-};
+    </>
+  )
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 10
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10
-  },
-  audioItem: {
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#f2f2f2',
-    borderRadius: 5
-  }
-});
+}
 
-export default AudioList;
+export default AudioList

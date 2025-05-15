@@ -6,3 +6,9 @@ export interface AudioType {
   data: { titulo: string };//proccessed data
   sent: boolean;
 }
+
+export interface DialogDeleteProps {
+  show: boolean;
+  audio: AudioType | null;
+  onDismiss: () => void;
+}
