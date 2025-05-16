@@ -11,11 +11,9 @@ import DialogDelete from './DialogDelete';
 
 function AudioList() {
   const { audios } = useAudioStore();
-  const [dialog, setDialog] = useState<DialogDeleteProps>({
-    show: false,
-    audio: null,
-    onDismiss: () => { }
-  });
+
+  const [audioToDelete, setAudioToDelete] = useState<AudioType | null>(null);
+  const [show, setShow] = useState(false);
   const { playAudio, toggleAudio, isPaused, audioUri } = useAudioController();
   const { getStoredAudios } = useAudioStorageService();
 
@@ -25,9 +23,9 @@ function AudioList() {
 
   return (
     <>
-      <DialogDelete show={dialog.show}
-        audio={dialog.audio}
-        onDismiss={dialog?.onDismiss} />
+      <DialogDelete show={show}
+        audio={audioToDelete}
+        setShow={setShow} />
       <Text variant='titleLarge' style={styles.h1}>
         {audios.length === 0 ? 'No hay audios' : 'Audios'}
       </Text>
@@ -39,7 +37,7 @@ function AudioList() {
             <IconButton
               icon="delete"
               iconColor='tomato'
-              onPress={() => setDialog((prev) => ({ ...prev, show: true, audio: item }))}
+              onPress={() => { setShow(true); setAudioToDelete(item) }}
             />
             <View>
               <Text variant="bodyLarge" style={[{ fontWeight: 'bold', width: (Dimensions.get('window').width - 180) }]}>

@@ -10,5 +10,5 @@ export interface AudioType {
 export interface DialogDeleteProps {
   show: boolean;
   audio: AudioType | null;
-  onDismiss: () => void;
+  setShow: (show: boolean) => void;
 }

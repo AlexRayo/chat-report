@@ -1,5 +1,4 @@
-import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from "expo-speech-recognition";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { Audio } from 'expo-av';
 
 import useLoading from "./useLoading";
@@ -12,52 +11,15 @@ function useRecord() {
   // Speech recognition
   const recordingRef = useRef<Audio.Recording | null>(null);
   const maxRecordingTimeout = useRef<NodeJS.Timeout | null>(null);
-  const [transcript, setTranscript] = useState("");
 
   const { startLoading, stopLoading } = useLoading();
   const { saveAudio } = useAudioStorageService();
 
-  useSpeechRecognitionEvent("result", (event) => {
-    setTranscript(event.results[0]?.transcript);
-    console.log("transcript:", event.results[0]?.transcript);
-  });
-  useSpeechRecognitionEvent("error", (event) => {
-    console.log("error code:", event.error, "error message:", event.message);
-  });
-  //
-
-  const startRecognition = async () => {
-    console.log("Start recording with speech recognition");
-    const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-    if (!result.granted) {
-      console.warn("Permissions not granted", result);
-      return;
-    }
-    // Start speech recognition
-    ExpoSpeechRecognitionModule.start({
-      lang: "es-ES",
-      interimResults: true,
-      continuous: true,
-      androidIntentOptions: {
-        EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS: 30000,
-      },
-    });
-  }
-
-  const stopRecognition = async () => {
-    console.log("Stopping speech recognition");
-    try {
-      ExpoSpeechRecognitionModule.stop(); // Detiene y entrega resultado final
-    } catch (e) {
-      console.error("Error al detener reconocimiento:", e);
-    }
-  };
 
   // Funciones para manejar el diálogo de reconocimiento y guardado de audio
   const startRecording = async () => {
     console.log("Start recording delayed");
     try {
-      startRecognition();
       // Crear la grabación
       const { recording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
@@ -74,7 +36,6 @@ function useRecord() {
   };
 
   const stopRecording = async () => {
-    stopRecognition();
     console.log("stop recording:", recordingRef.current)
     if (maxRecordingTimeout.current) {
       clearTimeout(maxRecordingTimeout.current);
@@ -109,7 +70,6 @@ function useRecord() {
   return {
     startRecording,
     stopRecording,
-    transcript
   };
 }
 
