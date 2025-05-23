@@ -41,7 +41,7 @@ function AudioList() {
             />
             <View>
               <Text variant="bodyLarge" style={[{ fontWeight: 'bold', width: (Dimensions.get('window').width - 180) }]}>
-                {item.processed ? item.data.titulo : 'Audio'}
+                {item.processed ? item.data.title : 'Audio'}
               </Text>
               <Text variant="bodyLarge">
                 {new Date(item.date).toLocaleString()}

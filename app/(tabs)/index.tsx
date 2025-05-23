@@ -4,6 +4,7 @@ import { Button } from 'react-native-paper';
 import RecordBtn from '@/components/RecordBtn';
 import { styles } from '@/styles/components';
 import AudioList from '@/components/AudioList';
+import ProcessAudios from '@/components/ProcessAudios';
 
 export default function App() {
 
@@ -11,9 +12,7 @@ export default function App() {
     <View style={styles.container}>
       <AudioList />
       <View style={styles.buttonsRow}>
-        <Button icon="send" compact={true} >
-          ENVIAR AL SERVIDOR
-        </Button>
+        <ProcessAudios />
         <RecordBtn />
       </View>
 

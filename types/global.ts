@@ -3,7 +3,7 @@ export interface AudioType {
   date: string;
   uri: string;
   processed: boolean;
-  data: { titulo: string };//proccessed data
+  data: { title: string, description: string };//proccessed data
   sent: boolean;
 }
 

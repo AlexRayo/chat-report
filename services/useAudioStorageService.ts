@@ -60,6 +60,31 @@ function useAudioStorageService() {
     }
   };
 
+  //
+  const saveAudios = async (audiosToSave: AudioType[]) => {
+    try {
+      const storedAudios = await AsyncStorage.getItem(AUDIO_STORAGE_KEY);
+      let existingAudios: AudioType[] = storedAudios ? JSON.parse(storedAudios) : [];
+
+      // Crea un mapa para actualizar o insertar los nuevos
+      const audioMap = new Map<string, AudioType>();
+      for (const audio of [...existingAudios, ...audiosToSave]) {
+        audioMap.set(audio.id, audio);
+      }
+
+      const mergedAudios = Array.from(audioMap.values());
+
+      await AsyncStorage.setItem(AUDIO_STORAGE_KEY, JSON.stringify(mergedAudios));
+      setAudios(mergedAudios); // actualiza estado global
+
+      return mergedAudios;
+    } catch (error) {
+      console.error("Error guardando audios en lote:", error);
+      throw error;
+    }
+  };
+
+
   // Obtiene todos los audios almacenados
   const getStoredAudios = async () => {
     try {
@@ -108,6 +133,7 @@ function useAudioStorageService() {
 
   return {
     saveAudio,
+    saveAudios,
     getStoredAudios,
     deleteAudio,
     deleteAll

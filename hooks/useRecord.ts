@@ -53,7 +53,7 @@ function useRecord() {
       const entry: AudioType = {
         id: Date.now().toString(),
         uri,
-        data: { titulo: "" },
+        data: { title: "", description: "" },
         date: new Date().toISOString(),
         processed: false,
         sent: false,
