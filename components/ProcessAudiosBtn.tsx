@@ -4,10 +4,14 @@ import { Button } from 'react-native-paper'
 import useProcessAudios from '@/services/process-audios'
 
 const ProcessAudios = () => {
-  const { processAudios } = useProcessAudios();
+  const { processAudios, loading } = useProcessAudios();
   return (
-    <Button icon="send" compact={true} onPress={processAudios}>
-      ENVIAR AL SERVIDOR
+    <Button
+      icon="send"
+      loading={loading}
+      disabled={loading}
+      compact={true} onPress={processAudios}>
+      PROCESAR AUDIOS
     </Button>
   )
 }

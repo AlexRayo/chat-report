@@ -7,6 +7,24 @@ import useAudioStorageService from "@/services/useAudioStorageService";
 
 const MAX_RECORDING_TIME = 15000; // (cámbialo a 60000 para 60 segundos)
 
+// Función para reproducir el sonido de aviso
+const playCueSound = async () => {
+  try {
+    const { sound } = await Audio.Sound.createAsync(
+      require('@/assets/startRecordingCue.mp3')
+    );
+    await sound.playAsync();
+    // Opcional: liberar el recurso después de reproducirlo
+    sound.setOnPlaybackStatusUpdate((status) => {
+      if ('didJustFinish' in status && status.didJustFinish) {
+        sound.unloadAsync();
+      }
+    });
+  } catch (error) {
+    console.error('Error al reproducir sonido de aviso:', error);
+  }
+};
+
 function useRecord() {
   // Speech recognition
   const recordingRef = useRef<Audio.Recording | null>(null);
@@ -19,6 +37,7 @@ function useRecord() {
   // Funciones para manejar el diálogo de reconocimiento y guardado de audio
   const startRecording = async () => {
     console.log("Start recording delayed");
+    playCueSound();
     try {
       // Crear la grabación
       const { recording } = await Audio.Recording.createAsync(

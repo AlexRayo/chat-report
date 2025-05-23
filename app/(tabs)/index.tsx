@@ -4,7 +4,7 @@ import { Button } from 'react-native-paper';
 import RecordBtn from '@/components/RecordBtn';
 import { styles } from '@/styles/components';
 import AudioList from '@/components/AudioList';
-import ProcessAudios from '@/components/ProcessAudios';
+import ProcessAudios from '@/components/ProcessAudiosBtn';
 
 export default function App() {
 
