@@ -3,11 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system';
 import { AudioType } from '@/types/global';
 import { useAudioStore } from '@/store/useAudioStore';
+import { Alert, ToastAndroid } from 'react-native';
 
 const AUDIO_STORAGE_KEY = 'AUDIO_FILES';
 
 function useAudioStorageService() {
-  const { addAudio, removeAudio, clearAudios, setAudios } = useAudioStore();
+  const { addAudio, removeAudio, clearAudios, setAudios, audios } = useAudioStore();
 
   // Guarda la metadata del audio y mueve el archivo a una ubicación persistente
   const saveAudio = async (audio: AudioType) => {
@@ -126,9 +127,26 @@ function useAudioStorageService() {
   };
 
   const deleteAll = async () => {
-    await AsyncStorage.clear();
-    clearAudios();
-
+    if (audios.length === 0) {
+      ToastAndroid.show('No hay audios para eliminar', ToastAndroid.LONG);
+      return;
+    }
+    Alert.alert(
+      'Eliminar todos los audios',
+      '¿Estás seguro de que quieres eliminar todos los audios? Esta acción no se puede deshacer.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Eliminar',
+          style: 'destructive',
+          onPress: async () => {
+            await AsyncStorage.clear();
+            clearAudios();
+          }
+        }
+      ]
+    );
+    ToastAndroid.show('Todos los audios han sido eliminados', ToastAndroid.LONG);
   };
 
   return {

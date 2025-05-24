@@ -59,9 +59,10 @@ function useProcessAudios() {
       await saveAudios(updatedAudios);
       console.log("Todos los audios procesados han sido guardados.");
     }
+
+    ToastAndroid.show("Todos los audios han sido procesados", ToastAndroid.LONG);
   };
 
-  ToastAndroid.show("Todos los audios han sido procesados", ToastAndroid.LONG);
 
   return {
     processAudios,
